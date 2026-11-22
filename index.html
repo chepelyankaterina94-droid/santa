@@ -68,7 +68,7 @@ select{color:#222;background:#fff}select option{color:#222;background:#fff}
    <video id="vid" playsinline muted style="width:100%;display:block;max-height:240px;object-fit:cover"></video>
    <div style="position:absolute;left:8%;right:8%;top:50%;height:2px;background:#ff4d6d;box-shadow:0 0 10px #ff4d6d"></div>
   </div>
-  <button class="btn" id="cam" style="width:100%">📷 Сканировать камерой</button><button class="btn" id="photoBtn" style="width:100%;margin-top:10px;background:linear-gradient(180deg,#9fd8ff,#4da6e0);box-shadow:0 6px 0 #2a6f9e">📸 Сфотографировать бейдж</button><input id="photo" type="file" accept="image/*" capture="environment" style="display:none"><div class="muted" id="camHint" style="display:none;margin-top:6px">Держи штрихкод по красной линии, на расстоянии 10–15 см</div>
+  <button class="btn" id="cam" style="width:100%">📷 Сканировать камерой</button><div class="muted" id="camHint" style="display:none;margin-top:6px">Держи штрихкод по красной линии, на расстоянии 10–15 см</div>
   <div class="muted" style="margin-top:14px">или введи код вручную</div>
   <input id="code" autocomplete="off" autocapitalize="characters" placeholder="код" style="width:100%;padding:14px;border-radius:12px;border:0;font-size:20px;margin-top:8px;text-align:center;color:#222;background:#fff">
   <button class="btn" id="go" style="width:100%;margin-top:12px">Это я! ✔</button>
@@ -99,7 +99,7 @@ async function reveal(e){const r=await api('draw',e.code);if(!r.ok)throw new Err
 function show(id){['intro','pick','draw'].forEach(s=>$(s).classList.toggle('hide',s!==id))}
 function showResult(name,to){show('draw');$('hi').textContent=name+', ты уже тянул(а) жребий!';$('spin').style.display='none';$('already').style.display='block';
  $('reel').textContent=to;$('reel').classList.add('win');$('out').classList.add('on');$('after').style.display='block'}
-function toDraw(name){show('draw');$('hi').textContent='Привет, '+(name.split(' ')[1]||name)+'! Крути барабан 🎡'}
+function toDraw(name){show('draw');$('hi').textContent='Привет, '+(name.split(' ').length>2?name.split(' ')[1]:name.split(' ')[0])+'! Крути барабан 🎡'}
 /* snow */
 const sc=$('snow'),sx=sc.getContext('2d');let fl=[];
 function rs(){sc.width=innerWidth;sc.height=innerHeight;$('confetti').width=innerWidth;$('confetti').height=innerHeight}rs();addEventListener('resize',rs);
@@ -154,7 +154,7 @@ $('go').onclick=()=>useCode($('code').value);
 $('code').addEventListener('keydown',e=>{if(e.key==='Enter')useCode($('code').value)});
 $('cam').onclick=async()=>{const perr=$('perr');perr.textContent='';
  try{stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}})}
- catch(e){perr.textContent='Нет доступа к камере 😢 Разреши камеру в настройках браузера или нажми «Сфотографировать бейдж»';return}
+ catch(e){perr.textContent='Нет доступа к камере 😢 Разреши камеру в настройках браузера или введи код вручную';return}
  const v=$('vid');v.srcObject=stream;$('camBox').style.display='block';$('camHint').style.display='block';$('cam').style.display='none';
  try{await v.play()}catch(e){}
  try{const tr=stream.getVideoTracks()[0];const cap=tr.getCapabilities?tr.getCapabilities():{};const adv={};if(cap.focusMode&&cap.focusMode.includes('continuous'))adv.focusMode='continuous';if(cap.zoom)adv.zoom=Math.min(cap.zoom.max,Math.max(cap.zoom.min,2));if(Object.keys(adv).length)await tr.applyConstraints({advanced:[adv]})}catch(e){}
@@ -168,11 +168,7 @@ $('cam').onclick=async()=>{const perr=$('perr');perr.textContent='';
    if(val){if(navigator.vibrate)navigator.vibrate(80);stopCam();return useCode(val)}}
   timer=setTimeout(tick,180)};
  tick()};
-$('photoBtn').onclick=()=>{$('perr').textContent='';$('photo').value='';$('photo').click()};
-$('photo').onchange=async()=>{const file=$('photo').files[0];if(!file)return;const perr=$('perr');perr.textContent='Распознаём…';
- try{const img=await createImageBitmap(file);const s=Math.min(1,2200/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  const val=await decodeCanvas(c);if(val){perr.textContent='';return useCode(val)}
-  perr.textContent='Не получилось распознать 😕 Сфотографируй штрихкод ближе и ровнее или введи код'}catch(e){perr.textContent='Не удалось открыть фото, попробуй ещё раз'}};
+let spinning=false,stopReq=false;
 $('spin').onclick=async()=>{const btn=$('spin');
  if(spinning){stopReq=true;resP=reveal(me);btn.disabled=true;btn.textContent='Останавливается…';return}
  spinning=true;btn.textContent='🛑 СТОП!';
