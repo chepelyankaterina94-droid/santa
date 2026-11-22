@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Тайный Санта 🎅</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,sans-serif;color:#fff;background:radial-gradient(ellipse at top,#1b2a5a 0%,#0a1030 55%,#05071a 100%)}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:0}
+.scene{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;z-index:2;transition:opacity .8s}
+.hide{opacity:0;pointer-events:none}
+.moon{position:fixed;top:6%;right:10%;width:80px;height:80px;border-radius:50%;background:#fff6d0;box-shadow:0 0 60px #fff6d0;z-index:1}
+.sleigh{position:fixed;top:14%;left:-260px;font-size:44px;z-index:1;white-space:nowrap;animation:fly 9s linear infinite}
+@keyframes fly{0%{transform:translate(0,0)}50%{transform:translate(70vw,-30px)}100%{transform:translate(calc(100vw + 300px),10px)}}
+.hills{position:fixed;bottom:0;left:0;right:0;height:22vh;background:radial-gradient(ellipse at 30% 100%,#fff 0 60%,transparent 61%),radial-gradient(ellipse at 80% 110%,#e8eefc 0 60%,transparent 61%);z-index:1}
+.trees{position:fixed;bottom:6vh;left:0;right:0;font-size:52px;display:flex;justify-content:space-around;z-index:1;opacity:.95}
+.line{font-size:30px;font-weight:800;opacity:0;transform:translateY(20px) scale(.9);transition:all .8s;text-shadow:0 4px 18px rgba(0,0,0,.6);margin:6px 0}
+.line.on{opacity:1;transform:none}
+.big{font-size:52px;background:linear-gradient(90deg,#ffe08a,#ff6b6b,#ffe08a);background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite}
+@keyframes shine{to{background-position:200%}}
+.btn{margin-top:22px;padding:16px 34px;font-size:20px;font-weight:800;border:0;border-radius:40px;background:linear-gradient(180deg,#ffd76a,#e0a020);color:#4a1800;box-shadow:0 6px 0 #9a6a00,0 10px 30px rgba(255,200,80,.5);cursor:pointer;animation:pulse 1.6s infinite}
+.btn:disabled{opacity:.5;animation:none}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.card{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);border-radius:22px;padding:22px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+select{width:100%;padding:14px;border-radius:12px;border:0;font-size:16px;margin-top:10px}
+/* drum */
+.stage{position:relative;width:280px;height:300px;margin:4px auto 0}
+.drum{position:absolute;left:30px;top:10px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),rgba(255,255,255,.05) 60%);border:8px solid #e0a020;box-shadow:inset 0 0 30px rgba(255,255,255,.3),0 0 40px rgba(255,200,80,.4);overflow:hidden}
+.drum::before,.drum::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid rgba(255,215,106,.5)}
+.drum::after{inset:46%;background:#e0a020;border:0}
+.spokes{position:absolute;inset:0}
+.spokes i{position:absolute;left:50%;top:0;width:3px;height:100%;background:rgba(255,215,106,.45);transform-origin:center}
+.ball{position:absolute;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;box-shadow:inset -4px -4px 8px rgba(0,0,0,.35),inset 3px 3px 6px rgba(255,255,255,.5)}
+.stand{position:absolute;left:100px;top:215px;width:80px;height:70px;background:linear-gradient(#b5121b,#7a0a10);clip-path:polygon(30% 0,70% 0,100% 100%,0 100%);border-radius:6px}
+.chute{position:absolute;left:186px;top:200px;width:70px;height:14px;background:#e0a020;border-radius:8px;transform:rotate(25deg)}
+.out{position:absolute;left:230px;top:232px;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff7c0,#e0a020);box-shadow:0 0 30px #ffd76a;opacity:0;transform:scale(0);transition:all .6s cubic-bezier(.2,1.6,.4,1);display:flex;align-items:center;justify-content:center;font-size:24px}
+.out.on{opacity:1;transform:scale(1)}
+.reel{height:64px;margin-top:6px;font-size:24px;font-weight:800;color:#ffe08a;display:flex;align-items:center;justify-content:center;text-shadow:0 0 14px rgba(255,224,138,.6)}
+.reel.blur{filter:blur(1px);opacity:.75}
+.win{font-size:28px;animation:pop .7s ease}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.muted{opacity:.8;font-size:14px}
+.note{margin-top:14px;font-size:13px;opacity:.7}
+.scene{overflow-y:auto;justify-content:safe center}
+.card{background:rgba(8,14,44,.88);border-color:rgba(255,215,106,.45)}
+#intro .line:not(.btn):not(.big){background:rgba(8,14,44,.7);padding:6px 14px;border-radius:14px}
+.big{font-size:clamp(30px,9vw,52px)}
+.line{font-size:clamp(20px,6vw,30px)}
+select{color:#222;background:#fff}select option{color:#222;background:#fff}
+@media (max-width:600px){.hills{height:12vh}.trees{font-size:34px;bottom:3vh}.sleigh{font-size:30px}.moon{width:56px;height:56px}
+ .stage{transform:scale(.85);transform-origin:top center;height:260px}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+</style></head><body>
+<script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script><canvas id="snow"></canvas><canvas id="confetti"></canvas>
+<div class="moon"></div><div class="sleigh">🦌🦌🦌🛷🎅</div><div class="hills"></div><div class="trees"><span>🎄</span><span>🏠</span><span>🎄</span><span>🎄</span></div>
+
+<div class="scene" id="intro">
+ <div class="line" id="l1">Хо-хо-хо! 🎅</div>
+ <div class="line" id="l2">Санта приготовил волшебный барабан…</div>
+ <div class="line" id="l3">В нём — имена всех участников ✨</div>
+ <div class="line big" id="l4">Кто станет твоим подопечным?</div>
+ <button class="btn line" id="start">🎁 Начать игру</button>
+</div>
+
+<div class="scene hide" id="pick">
+ <div class="card">
+  <div style="font-size:26px;font-weight:800">🎫 Покажи свой бейдж</div>
+  <div class="muted">Отсканируй штрихкод со своего бейджа</div>
+  <div id="camBox" style="display:none;position:relative;margin-top:10px;border-radius:14px;overflow:hidden;border:3px solid #e0a020;background:#000">
+   <video id="vid" playsinline muted style="width:100%;display:block;max-height:240px;object-fit:cover"></video>
+   <div style="position:absolute;left:8%;right:8%;top:50%;height:2px;background:#ff4d6d;box-shadow:0 0 10px #ff4d6d"></div>
+  </div>
+  <button class="btn" id="cam" style="width:100%">📷 Включить камеру</button>
+  <div class="muted" style="margin-top:14px">или введи код вручную</div>
+  <input id="code" autocomplete="off" autocapitalize="characters" placeholder="код" style="width:100%;padding:14px;border-radius:12px;border:0;font-size:20px;margin-top:8px;text-align:center;color:#222;background:#fff">
+  <button class="btn" id="go" style="width:100%;margin-top:12px">Это я! ✔</button>
+  <div id="perr" style="min-height:20px;margin-top:8px;color:#ffb3b3;font-size:15px"></div>
+ </div>
+</div>
+<div class="scene hide" id="draw">
+ <div class="card">
+  <div id="hi" style="font-size:18px"></div>
+  <div class="stage">
+   <div class="drum" id="drum"><div class="spokes"><i></i><i style="transform:rotate(45deg)"></i><i style="transform:rotate(90deg)"></i><i style="transform:rotate(135deg)"></i></div></div>
+   <div class="chute"></div><div class="stand"></div><div class="out" id="out">🎁</div>
+  </div>
+  <div class="reel" id="reel">Жми «Крутить», потом «СТОП!»</div>
+  <button class="btn" id="spin" style="width:100%">🎡 Крутить барабан</button>
+  <div id="after" style="display:none"><div style="margin-top:8px">Ты — Тайный Санта для этого человека.<br>Никому не говори! 🤫</div></div>
+  <div class="note" id="already" style="display:none">Ты уже участвовал(а) — повторно тянуть нельзя 🎅</div>
+ </div>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbwOrdhem5pOVXYZk1OR_M8O-x2m9GGTmr_oEqpx728NEMGMQV0HJDh-i7jQH_4QMgP4/exec";
+const D=['Ахмедиева Екатерина Сергеевна','Василенко Сергей Дмитриевич','Говор Роман Юрьевич','Другова Маргарита Андреевна','Келдияров Тимур Шавкатович','Кемер Әділет Қаныбекұлы','Мусабеков Махамбет Оразханулы','Наурыз Утешов','Поливода Александр Валерьевич','Рубилов Антон Олегович','Солодун Ксения Александровна','Титовец Юлия Александровна','Тюрина Екатерина Ильинична','Ус Марк Анатольевич','Фазыл Махсут Муратұлы','Чепилян Дмитрий Максимович','Шихов Эдуард Романович'].map(n=>({n}));
+let resP=null,me=null;
+const $=id=>document.getElementById(id);
+async function api(a,code){return fetch(API+'?a='+a+'&code='+encodeURIComponent(code)).then(r=>r.json())}
+async function reveal(e){const r=await api('draw',e.code);if(!r.ok)throw new Error(r.error);return r.to}
+function show(id){['intro','pick','draw'].forEach(s=>$(s).classList.toggle('hide',s!==id))}
+function showResult(name,to){show('draw');$('hi').textContent=name+', ты уже тянул(а) жребий!';$('spin').style.display='none';$('already').style.display='block';
+ $('reel').textContent=to;$('reel').classList.add('win');$('out').classList.add('on');$('after').style.display='block'}
+function toDraw(name){show('draw');$('hi').textContent='Привет, '+(name.split(' ')[1]||name)+'! Крути барабан 🎡'}
+/* snow */
+const sc=$('snow'),sx=sc.getContext('2d');let fl=[];
+function rs(){sc.width=innerWidth;sc.height=innerHeight;$('confetti').width=innerWidth;$('confetti').height=innerHeight}rs();addEventListener('resize',rs);
+for(let i=0;i<120;i++)fl.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:1+Math.random()*3,v:.4+Math.random()*1.2,w:Math.random()*6});
+(function snow(){sx.clearRect(0,0,sc.width,sc.height);sx.fillStyle='rgba(255,255,255,.85)';for(const f of fl){f.y+=f.v;f.w+=.02;f.x+=Math.sin(f.w)*.5;if(f.y>sc.height){f.y=-5;f.x=Math.random()*sc.width}sx.beginPath();sx.arc(f.x,f.y,f.r,0,7);sx.fill()}requestAnimationFrame(snow)})();
+
+/* confetti */
+function confetti(){const c=$('confetti'),x=c.getContext('2d');const cols=['#ffd76a','#ff4d6d','#4dd2ff','#7dff8a','#fff'];
+ let p=Array.from({length:180},()=>({x:c.width/2,y:c.height/2,vx:(Math.random()-.5)*14,vy:Math.random()*-14-4,r:4+Math.random()*5,c:cols[Math.floor(Math.random()*5)],a:Math.random()*6}));let t=0;
+ (function f(){x.clearRect(0,0,c.width,c.height);for(const q of p){q.vy+=.35;q.x+=q.vx;q.y+=q.vy;q.a+=.2;x.save();x.translate(q.x,q.y);x.rotate(q.a);x.fillStyle=q.c;x.fillRect(-q.r/2,-q.r/2,q.r,q.r*1.6);x.restore()}if(++t<200)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})()}
+
+/* drum balls */
+const drum=$('drum'),cols=['#ff4d6d','#4dd2ff','#7dff8a','#ffb84d','#c77dff','#ff7ab8'];let balls=[];
+D.forEach((e,i)=>{const b=document.createElement('div');b.className='ball';b.style.background=cols[i%cols.length];
+ b.textContent=e.n.split(' ').slice(0,2).map(w=>w[0]).join('');drum.appendChild(b);
+ balls.push({el:b,a:Math.random()*6.28,r:40+Math.random()*50,s:0})});
+let speed=0,rot=0;
+(function tick(){rot+=speed;drum.querySelector('.spokes').style.transform='rotate('+rot+'rad)';
+ for(const b of balls){if(speed>0.01){b.a+=speed*(1+Math.random()*.6);b.r=30+Math.abs(Math.sin(b.a*1.7+b.r))*55}
+  const ang=speed>0.01?b.a:Math.PI/2+(b.a%1-.5)*1.6;const rr=speed>0.01?b.r:70+(b.r%20);
+  b.el.style.left=(93+Math.cos(ang)*rr)+'px';b.el.style.top=(93+Math.sin(ang)*rr)+'px'}
+ requestAnimationFrame(tick)})();
+
+/* intro */
+['l1','l2','l3','l4','start'].forEach((id,i)=>setTimeout(()=>$(id).classList.add('on'),400+i*1100));
+$('start').onclick=()=>show('pick');
+let reader=null,busy=false;
+function stopCam(){try{reader&&reader.reset()}catch(e){}$('camBox').style.display='none';$('cam').style.display='block'}
+async function useCode(raw){if(busy)return;const code=String(raw||'').trim();const perr=$('perr');perr.textContent='';
+ if(!code){$('code').focus();perr.textContent='Отсканируй бейдж или введи код';return}
+ busy=true;$('go').disabled=true;$('go').textContent='Проверяем…';let r;
+ try{r=await api('who',code)}catch(e){r=null}
+ busy=false;$('go').disabled=false;$('go').textContent='Это я! ✔';
+ if(!r){perr.textContent='Нет связи с сервером 😢 Попробуй ещё раз';return}
+ if(!r.ok){perr.textContent='Такого бейджа нет в игре 🙅 Попробуй ещё раз';$('code').value='';return}
+ stopCam();me={n:r.name,code:code};if(r.to)return showResult(r.name,r.to);toDraw(r.name)}
+$('go').onclick=()=>useCode($('code').value);
+$('code').addEventListener('keydown',e=>{if(e.key==='Enter')useCode($('code').value)});
+$('cam').onclick=async()=>{const perr=$('perr');perr.textContent='';
+ if(!window.ZXing){perr.textContent='Сканер не загрузился, введи код вручную';return}
+ try{const hints=new Map();hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[ZXing.BarcodeFormat.CODE_39,ZXing.BarcodeFormat.CODE_128,ZXing.BarcodeFormat.EAN_13,ZXing.BarcodeFormat.QR_CODE]);hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
+  reader=new ZXing.BrowserMultiFormatReader(hints,200);$('camBox').style.display='block';$('cam').style.display='none';
+  await reader.decodeFromConstraints({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},$('vid'),(res,err)=>{if(res&&!busy){if(navigator.vibrate)navigator.vibrate(80);useCode(res.getText())}})}
+ catch(e){stopCam();perr.textContent='Камера недоступна. Разреши доступ к камере или введи код вручную'}};let spinning=false,stopReq=false;
+$('spin').onclick=async()=>{const btn=$('spin');
+ if(spinning){stopReq=true;resP=reveal(me);btn.disabled=true;btn.textContent='Останавливается…';return}
+ spinning=true;btn.textContent='🛑 СТОП!';
+ const pool=D.map(x=>x.n).filter(n=>n!==me.n);const reel=$('reel');reel.classList.add('blur');
+ const up=setInterval(()=>{speed=Math.min(.35,speed+.02)},50);
+ let d=50,t=0;await new Promise(done=>{(function roll(){reel.textContent=pool[Math.floor(Math.random()*pool.length)];
+  if(stopReq){clearInterval(up);speed*=.93;d*=1.15;t+=d}
+  if(t<1800)setTimeout(roll,d);else done()})()});
+ speed=0;let res;try{res=await resP}catch(err){reel.classList.remove('blur');reel.textContent=err.message==='taken'||err.message==='device_used'?'Так нельзя 🙅 Обнови страницу':'Нет связи с сервером 😢 Обнови страницу';return}$('out').classList.add('on');
+ setTimeout(()=>{reel.classList.remove('blur');reel.textContent=res;reel.classList.add('win');btn.style.display='none';$('after').style.display='block';confetti()},700)};
+</script></body></html>
